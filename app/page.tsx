@@ -5,6 +5,7 @@ import { LinkCard } from "@/components/link-card";
 import { LinkFormModal } from "@/components/link-form-modal";
 import { MobileNav } from "@/components/mobile-nav";
 import { Pagination } from "@/components/pagination";
+import { RealtimeRefresher } from "@/components/realtime-refresher";
 import { SearchBar } from "@/components/search-bar";
 import { Sidebar } from "@/components/sidebar";
 import { TagFilter } from "@/components/tag-filter";
@@ -57,6 +58,7 @@ export default async function DashboardPage({
   return (
     <>
       <Header email={user.email ?? null} />
+      <RealtimeRefresher userId={user.id} />
       <div className="flex flex-1">
         <Sidebar />
         <main className="mb-24 min-w-0 flex-1 p-md md:mb-0 md:p-xl">

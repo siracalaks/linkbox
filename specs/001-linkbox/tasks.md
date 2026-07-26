@@ -85,7 +85,7 @@
 
 **Independent Test**: quickstart.md senaryo 5 — iki tarayıcı, birinde ekle → diğerinde liste yenilenir (env gerektirir; env'siz sadece derleme doğrulanır).
 
-- [ ] T019 [US4] `components/realtime-refresher.tsx`: client component; env+oturum varsa `postgres_changes` (links, `filter: user_id=eq.<uid>`) aboneliği → `router.refresh()`; unmount'ta unsubscribe; `app/page.tsx` ve `app/links/[id]/page.tsx`'e ekle (FR-004, anayasa II realtime izolasyonu)
+- [X] T019 [US4] `components/realtime-refresher.tsx`: client component; env+oturum varsa `postgres_changes` (links, `filter: user_id=eq.<uid>`) aboneliği → `router.refresh()`; unmount'ta unsubscribe; `app/page.tsx` ve `app/links/[id]/page.tsx`'e ekle (FR-004, anayasa II realtime izolasyonu)
 
 **Checkpoint**: commit "us4: user_id filtreli realtime tazeleme"
 
