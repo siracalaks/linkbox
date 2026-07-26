@@ -1,0 +1,36 @@
+name: Claude Code Otonom İnşa (Spec-Driven)
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: claude-build
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Spec-kit feature bağlamını sabitle
+        run: printf '{"feature_directory":"%s/specs/001-linkbox"}\n' "$GITHUB_WORKSPACE" > .specify/feature.json
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            CLAUDE.md, .specify/memory/constitution.md ve specs/001-linkbox/spec.md dosyalarını oku.
+            Sırasıyla üç spec-kit aşamasını uygula:
+            1. /speckit-plan — .claude/skills/speckit-plan/SKILL.md talimatlarıyla teknik planı üret.
+            2. /speckit-tasks — .claude/skills/speckit-tasks/SKILL.md talimatlarıyla tasks.md'yi üret.
+            3. /speckit-implement — .claude/skills/speckit-implement/SKILL.md talimatlarıyla görevleri
+               SIRAYLA uygula; her görevde `npx tsc --noEmit && npm run build` doğrulamasını geçmeden ilerleme.
+            Skill'ler doğrudan çağrılabiliyorsa çağır; çağrılamıyorsa ilgili SKILL.md içeriğini
+            okuyup talimatları aynen uygula. Script'leri her zaman `bash <yol>` ile çalıştır.
+            Anayasaya aykırı hiçbir karar alma. Tasarımda docs/STITCH-PROMPT.md token'larına ve
+            varsa docs/design/ altındaki gerçek Stitch ekran referansına sadık kal.
+            Bittiğinde tüm değişiklikleri commit'le ve main'e push'la.
+          claude_args: "--max-turns 250"
