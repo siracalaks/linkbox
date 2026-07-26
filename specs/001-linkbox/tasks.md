@@ -93,10 +93,10 @@
 
 ## Phase 7: Polish & Cross-Cutting Concerns
 
-- [ ] T020 [P] FR-006: `lib/storage.ts` — `getPreviewUrl(path)` `previews` bucket'tan 300 sn `createSignedUrl`; `app/links/[id]/page.tsx` ve link-card preview_path varsa kullanır, yoksa fallback ikon (upload UI YOK — research D14)
-- [ ] T021 [P] Erişilebilirlik ve responsive geçişi (UI-006/UI-007): tüm interaktif öğelerde aria-label/role, modal odak tuzağı, klavye navigasyonu; 375/768/1280 px yerleşim kontrolü; `Cache-Control: private` başlığı gereken yerde (research D5)
-- [ ] T022 [P] Dokümantasyon: `README.md` (kurulum, env listesi, migration talimatı, Coolify notu, quickstart özeti); public API fonksiyonlarına JSDoc (anayasa IV)
-- [ ] T023 Son doğrulama: `npm test && npx tsc --noEmit && npm run build` temiz; quickstart.md env'siz adımları birebir uygulanabilir; spec FR/UI gereksinimlerine karşı son tarama
+- [X] T020 [P] FR-006: `lib/storage.ts` — `getPreviewUrl(path)` `previews` bucket'tan 300 sn `createSignedUrl`; `app/links/[id]/page.tsx` ve link-card preview_path varsa kullanır, yoksa fallback ikon (upload UI YOK — research D14)
+- [X] T021 [P] Erişilebilirlik ve responsive geçişi (UI-006/UI-007): tüm interaktif öğelerde aria-label/role, modal odak tuzağı, klavye navigasyonu; 375/768/1280 px yerleşim kontrolü; `Cache-Control: private` başlığı gereken yerde (research D5)
+- [X] T022 [P] Dokümantasyon: `README.md` (kurulum, env listesi, migration talimatı, Coolify notu, quickstart özeti); public API fonksiyonlarına JSDoc (anayasa IV)
+- [X] T023 Son doğrulama: `npm test && npx tsc --noEmit && npm run build` temiz; quickstart.md env'siz adımları birebir uygulanabilir; spec FR/UI gereksinimlerine karşı son tarama
 
 **Checkpoint**: commit "cila: signed url yardımcısı, erişilebilirlik, dokümantasyon"
 

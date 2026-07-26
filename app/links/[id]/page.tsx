@@ -7,6 +7,7 @@ import { RealtimeRefresher } from "@/components/realtime-refresher";
 import { isSupabaseConfigured } from "@/lib/env";
 import { formatDateTr } from "@/lib/format";
 import { getLink, listTags } from "@/lib/queries";
+import { getPreviewUrl } from "@/lib/storage";
 import { getSessionUser } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -36,6 +37,8 @@ export default async function LinkDetailPage({
   const [link, tags] = await Promise.all([getLink(params.id), listTags()]);
   if (!link) notFound();
 
+  const previewUrl = await getPreviewUrl(link.preview_path);
+
   return (
     <>
       <Header backHref="/" email={user.email ?? null} />
@@ -51,16 +54,14 @@ export default async function LinkDetailPage({
 
         <div className="grid grid-cols-1 items-start gap-xl lg:grid-cols-2">
           <div className="glass-effect aspect-video w-full overflow-hidden rounded-2xl">
-            {link.preview_path ? (
-              // Önizleme signed URL üretimi Faz 7'de bağlanır (FR-006).
-              <div className="flex h-full w-full items-center justify-center bg-surface-container-low">
-                <span
-                  aria-hidden="true"
-                  className="material-symbols-outlined text-[64px] text-primary/40"
-                >
-                  image
-                </span>
-              </div>
+            {previewUrl ? (
+              // Signed URL 5 dk geçerli (FR-006); private bucket'tan sunulur.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                alt={`${link.title ?? "Link"} önizleme görseli`}
+                className="h-full w-full object-cover"
+                src={previewUrl}
+              />
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-surface-container-low">
                 <span

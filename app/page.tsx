@@ -11,6 +11,7 @@ import { Sidebar } from "@/components/sidebar";
 import { TagFilter } from "@/components/tag-filter";
 import { isSupabaseConfigured } from "@/lib/env";
 import { listLinks, listTags } from "@/lib/queries";
+import { getPreviewUrlMap } from "@/lib/storage";
 import { getSessionUser } from "@/lib/supabase/server";
 
 // Env ve oturum her istekte kontrol edilir (research D11, D5: public cache yok).
@@ -54,6 +55,12 @@ export default async function DashboardPage({
   ]);
 
   const isModalOpen = searchParams.new === "1";
+
+  const previewUrls = await getPreviewUrlMap(
+    result.links
+      .map((link) => link.preview_path)
+      .filter((path): path is string => Boolean(path))
+  );
 
   return (
     <>
@@ -107,7 +114,15 @@ export default async function DashboardPage({
             ) : (
               <div className="grid grid-cols-1 gap-gutter sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {result.links.map((link) => (
-                  <LinkCard key={link.id} link={link} previewUrl={null} />
+                  <LinkCard
+                    key={link.id}
+                    link={link}
+                    previewUrl={
+                      link.preview_path
+                        ? previewUrls.get(link.preview_path) ?? null
+                        : null
+                    }
+                  />
                 ))}
               </div>
             )}
