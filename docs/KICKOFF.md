@@ -16,7 +16,14 @@ Sonra sırayla üç spec-kit aşamasını uygula:
 
 Her faz bitiminde commit'le. Anayasaya aykırı hiçbir karar alma.
 
-UI görevlerinden önce docs/design/ içeriğine (varsa gerçek Stitch ekranına) bak.
+UI görevlerinden önce docs/design/ içeriğine (varsa gerçek Stitch ekranlarına) bak.
+Tüm ekranları mobil, tablet ve masaüstünde responsive üret — bu zorunludur.
+
+Spec'teki Clarifications maddeleri birbiriyle çelişiyorsa ana kullanım senaryosunu
+bozmayanı uygula ve tercihini plan.md'de gerekçelendir.
+
+Test altyapısı kurduysan doğrulamaya test komutunu da ekle (npm test / pytest);
+kurmadıysan hiçbir dokümanda test iddiasında bulunma.
 
 (İsteğe bağlı: spec'te açık soru kaldıysa önce /speckit-clarify; kalite için /speckit-analyze; UX kalitesi için /speckit-checklist ux.)
 
