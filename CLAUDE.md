@@ -12,3 +12,4 @@ Bu repo GitHub **spec-kit** (v0.14.2) Spec-Driven Development düzenini kullanı
 - `.specify/scripts/bash/` altındaki script'leri her zaman `bash <yol>` ile çalıştır (exec biti yok).
 - Genel doğrulama komutu: `npx tsc --noEmit && npm run build` — geçmeden görev tamamlanmış sayılmaz.
 - Tasarım: `docs/STITCH-PROMPT.md` token ve tipografisine sadık kal.
+- TÜM ekranlar mobil, tablet ve masaüstünde responsive olmak ZORUNDADIR — bu pazarlıksız bir kuraldır.
