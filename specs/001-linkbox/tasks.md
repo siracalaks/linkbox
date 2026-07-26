@@ -59,8 +59,8 @@
 
 **Independent Test**: quickstart.md senaryo 3 — iki etiket seç → yalnızca ikisini de taşıyan linkler; chip kaldırınca filtre gevşer.
 
-- [ ] T015 [US2] `lib/queries.ts` listLinks'e AND etiket filtresi: seçili her tagId için eşleşme (link_tags üzerinden; tümünü taşıyan link id kümesi) + `tests/unit/` filtre yardımcı fonksiyonu testi (id kümesi kesişimi saf fonksiyonsa)
-- [ ] T016 [US2] `components/tag-filter.tsx`: kullanıcı etiketleri chip barı, `#tümü` + toggle (aria-pressed), seçililer `?tags=id1,id2` URL state; `app/page.tsx`'e entegre; responsive sarma (UI-003)
+- [X] T015 [US2] `lib/queries.ts` listLinks'e AND etiket filtresi: seçili her tagId için eşleşme (link_tags üzerinden; tümünü taşıyan link id kümesi) + `tests/unit/` filtre yardımcı fonksiyonu testi (id kümesi kesişimi saf fonksiyonsa)
+- [X] T016 [US2] `components/tag-filter.tsx`: kullanıcı etiketleri chip barı, `#tümü` + toggle (aria-pressed), seçililer `?tags=id1,id2` URL state; `app/page.tsx`'e entegre; responsive sarma (UI-003)
 
 **Checkpoint**: commit "us2: AND mantıklı etiket filtreleme"
 

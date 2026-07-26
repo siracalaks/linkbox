@@ -6,6 +6,7 @@ import { LinkFormModal } from "@/components/link-form-modal";
 import { MobileNav } from "@/components/mobile-nav";
 import { Pagination } from "@/components/pagination";
 import { Sidebar } from "@/components/sidebar";
+import { TagFilter } from "@/components/tag-filter";
 import { isSupabaseConfigured } from "@/lib/env";
 import { listLinks, listTags } from "@/lib/queries";
 import { getSessionUser } from "@/lib/supabase/server";
@@ -58,6 +59,11 @@ export default async function DashboardPage({
       <div className="flex flex-1">
         <Sidebar />
         <main className="mb-24 min-w-0 flex-1 p-md md:mb-0 md:p-xl">
+          <section className="mx-auto mb-xl max-w-container-max">
+            <div className="flex flex-col justify-between gap-md lg:flex-row lg:items-center">
+              <TagFilter tags={tags} />
+            </div>
+          </section>
           <section className="mx-auto max-w-container-max">
             {result.links.length === 0 ? (
               <div className="glass-effect flex flex-col items-center gap-md rounded-xl p-2xl text-center">

@@ -1,4 +1,5 @@
 import { decodeCursor, encodeCursor } from "@/lib/cursor";
+import { intersectLinkIds } from "@/lib/tag-filter";
 import { getSupabaseServer } from "@/lib/supabase/server";
 import type { LinkListResult, LinkWithTags, Tag } from "@/lib/types";
 
@@ -97,32 +98,6 @@ export async function listLinks(params: ListLinksParams = {}): Promise<LinkListR
     hasMore && last ? encodeCursor({ c: last.created_at, i: last.id }) : null;
 
   return { links, nextCursor, total: count ?? 0 };
-}
-
-/**
- * AND filtre yardımcısı: verilen (link_id, tag_id) eşleşmelerinden,
- * gereken TÜM etiketleri taşıyan link id'lerini döndürür (saf fonksiyon).
- */
-export function intersectLinkIds(
-  rows: Array<{ link_id: string; tag_id: string }>,
-  requiredTagIds: string[]
-): string[] {
-  const byLink = new Map<string, Set<string>>();
-  for (const row of rows) {
-    const set = byLink.get(row.link_id) ?? new Set<string>();
-    set.add(row.tag_id);
-    byLink.set(row.link_id, set);
-  }
-  const required = new Set(requiredTagIds);
-  const result: string[] = [];
-  byLink.forEach((tagSet, linkId) => {
-    let hasAll = true;
-    required.forEach((tagId) => {
-      if (!tagSet.has(tagId)) hasAll = false;
-    });
-    if (hasAll) result.push(linkId);
-  });
-  return result;
 }
 
 /** Tek linki etiketleriyle getirir; bulunamazsa null. */
