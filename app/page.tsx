@@ -1,10 +1,114 @@
-/** Geçici ana sayfa — Faz 3'te dashboard ile değiştirilecek. */
-export default function HomePage() {
+import { redirect } from "next/navigation";
+import { DbPending } from "@/components/db-pending";
+import { Header } from "@/components/header";
+import { LinkCard } from "@/components/link-card";
+import { LinkFormModal } from "@/components/link-form-modal";
+import { MobileNav } from "@/components/mobile-nav";
+import { Pagination } from "@/components/pagination";
+import { Sidebar } from "@/components/sidebar";
+import { isSupabaseConfigured } from "@/lib/env";
+import { listLinks, listTags } from "@/lib/queries";
+import { getSessionUser } from "@/lib/supabase/server";
+
+// Env ve oturum her istekte kontrol edilir (research D11, D5: public cache yok).
+export const dynamic = "force-dynamic";
+
+interface DashboardSearchParams {
+  q?: string;
+  tags?: string;
+  cursor?: string;
+  new?: string;
+}
+
+/** Dashboard — Ekran 1 (docs/design/screen-1.html): liste, filtre, sayfalama. */
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: DashboardSearchParams;
+}) {
+  if (!isSupabaseConfigured()) {
+    return (
+      <>
+        <Header email={null} />
+        <main className="p-md md:p-xl">
+          <DbPending />
+        </main>
+      </>
+    );
+  }
+
+  const user = await getSessionUser();
+  if (!user) redirect("/login");
+
+  const tagIds = searchParams.tags
+    ? searchParams.tags.split(",").filter(Boolean)
+    : [];
+  const hasQuery = Boolean(searchParams.q && searchParams.q.trim());
+
+  const [result, tags] = await Promise.all([
+    listLinks({ q: searchParams.q, tagIds, cursor: searchParams.cursor }),
+    listTags(),
+  ]);
+
+  const isModalOpen = searchParams.new === "1";
+
   return (
-    <main className="flex min-h-screen items-center justify-center p-md">
-      <h1 className="font-display text-display-lg-mobile text-primary md:text-display-lg">
-        Linkbox
-      </h1>
-    </main>
+    <>
+      <Header email={user.email ?? null} />
+      <div className="flex flex-1">
+        <Sidebar />
+        <main className="mb-24 min-w-0 flex-1 p-md md:mb-0 md:p-xl">
+          <section className="mx-auto max-w-container-max">
+            {result.links.length === 0 ? (
+              <div className="glass-effect flex flex-col items-center gap-md rounded-xl p-2xl text-center">
+                {hasQuery || tagIds.length > 0 ? (
+                  <>
+                    <span
+                      aria-hidden="true"
+                      className="material-symbols-outlined text-[48px] text-primary/40"
+                    >
+                      search_off
+                    </span>
+                    <p className="text-body-md text-on-surface-variant">Sonuç bulunamadı</p>
+                  </>
+                ) : (
+                  <>
+                    <span
+                      aria-hidden="true"
+                      className="material-symbols-outlined text-[48px] text-primary/40"
+                    >
+                      bookmark_add
+                    </span>
+                    <p className="text-body-md text-on-surface-variant">
+                      Henüz kayıtlı link yok. İlk linkinizi ekleyin.
+                    </p>
+                    <a
+                      className="indigo-gradient-btn flex items-center gap-sm rounded-xl px-lg py-sm text-label-md text-white"
+                      href="/?new=1"
+                    >
+                      <span aria-hidden="true" className="material-symbols-outlined">
+                        add
+                      </span>
+                      Yeni Link Ekle
+                    </a>
+                  </>
+                )}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-gutter sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {result.links.map((link) => (
+                  <LinkCard key={link.id} link={link} previewUrl={null} />
+                ))}
+              </div>
+            )}
+            <Pagination nextCursor={result.nextCursor} total={result.total} />
+          </section>
+        </main>
+      </div>
+      <MobileNav />
+      {isModalOpen ? (
+        <LinkFormModal existingTagNames={tags.map((tag) => tag.name)} />
+      ) : null}
+    </>
   );
 }
