@@ -72,8 +72,8 @@
 
 **Independent Test**: quickstart.md senaryo 4 — kelime yaz → eşleşen kartlar; anlamsız kelime → "Sonuç bulunamadı".
 
-- [ ] T017 [US3] `lib/queries.ts` listLinks'e arama: `search_vector @@ websearch_to_tsquery('simple', q)` (`textSearch`), keyset ile birlikte çalışır
-- [ ] T018 [US3] `components/search-bar.tsx`: placeholder "Tam metin ara...", 300 ms debounce ile `?q=` günceller (router.replace), aria-label; `app/page.tsx` boş sonuçta "Sonuç bulunamadı" gösterir (US3-2)
+- [X] T017 [US3] `lib/queries.ts` listLinks'e arama: `search_vector @@ websearch_to_tsquery('simple', q)` (`textSearch`), keyset ile birlikte çalışır
+- [X] T018 [US3] `components/search-bar.tsx`: placeholder "Tam metin ara...", 300 ms debounce ile `?q=` günceller (router.replace), aria-label; `app/page.tsx` boş sonuçta "Sonuç bulunamadı" gösterir (US3-2)
 
 **Checkpoint**: commit "us3: debounce'lu tam metin arama"
 

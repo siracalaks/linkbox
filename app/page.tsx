@@ -5,6 +5,7 @@ import { LinkCard } from "@/components/link-card";
 import { LinkFormModal } from "@/components/link-form-modal";
 import { MobileNav } from "@/components/mobile-nav";
 import { Pagination } from "@/components/pagination";
+import { SearchBar } from "@/components/search-bar";
 import { Sidebar } from "@/components/sidebar";
 import { TagFilter } from "@/components/tag-filter";
 import { isSupabaseConfigured } from "@/lib/env";
@@ -61,6 +62,7 @@ export default async function DashboardPage({
         <main className="mb-24 min-w-0 flex-1 p-md md:mb-0 md:p-xl">
           <section className="mx-auto mb-xl max-w-container-max">
             <div className="flex flex-col justify-between gap-md lg:flex-row lg:items-center">
+              <SearchBar />
               <TagFilter tags={tags} />
             </div>
           </section>
