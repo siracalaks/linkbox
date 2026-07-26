@@ -19,8 +19,10 @@ jobs:
       - name: Spec-kit feature bağlamını sabitle
         run: printf '{"feature_directory":"%s/specs/001-linkbox"}\n' "$GITHUB_WORKSPACE" > .specify/feature.json
       - uses: anthropics/claude-code-action@v1
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
             CLAUDE.md, .specify/memory/constitution.md ve specs/001-linkbox/spec.md dosyalarını oku.
             Sırasıyla üç spec-kit aşamasını uygula:
@@ -31,6 +33,13 @@ jobs:
             Skill'ler doğrudan çağrılabiliyorsa çağır; çağrılamıyorsa ilgili SKILL.md içeriğini
             okuyup talimatları aynen uygula. Script'leri her zaman `bash <yol>` ile çalıştır.
             Anayasaya aykırı hiçbir karar alma. Tasarımda docs/STITCH-PROMPT.md token'larına ve
-            varsa docs/design/ altındaki gerçek Stitch ekran referansına sadık kal.
+            varsa docs/design/ altındaki gerçek Stitch ekran referanslarına sadık kal.
+            TÜM ekranları mobil, tablet ve masaüstünde responsive üret — pazarlıksız kural.
+            Spec'teki Clarifications maddeleri çelişiyorsa ana senaryoyu bozmayanı uygula
+            ve tercihini plan.md'de gerekçelendir. Test altyapısı kurduysan doğrulamaya
+            test komutunu da ekle; kurmadıysan test iddiasında bulunma.
+            Veritabanı şemasını supabase/migrations/*.sql dosyaları olarak yaz.
+            SUPABASE_DB_URL env'i doluysa her migration'ı `psql "$SUPABASE_DB_URL" -f <dosya>`
+            ile gerçekten uygula; boşsa dosyaları yaz ama uygulamayı deneme.
             Bittiğinde tüm değişiklikleri commit'le ve main'e push'la.
           claude_args: "--max-turns 250"
