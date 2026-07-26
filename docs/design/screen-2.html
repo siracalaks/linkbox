@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Linkbox - Modern JavaScript Frameworkleri Analizi</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#c7c4d8",
+                        "outline-variant": "#464555",
+                        "primary-fixed": "#e2dfff",
+                        "surface-container-highest": "#273647",
+                        "on-tertiary": "#571f00",
+                        "on-background": "#d4e4fa",
+                        "tertiary-fixed": "#ffdbcc",
+                        "on-tertiary-fixed-variant": "#7b2f00",
+                        "inverse-primary": "#4d44e3",
+                        "error": "#ffb4ab",
+                        "on-primary-container": "#dad7ff",
+                        "on-primary-fixed": "#0f0069",
+                        "surface-container-low": "#0d1c2d",
+                        "secondary-fixed": "#c9e6ff",
+                        "on-error-container": "#ffdad6",
+                        "primary-fixed-dim": "#c3c0ff",
+                        "on-error": "#690005",
+                        "surface-variant": "#273647",
+                        "surface": "#051424",
+                        "primary-container": "#4f46e5",
+                        "on-surface": "#d4e4fa",
+                        "on-secondary": "#00344d",
+                        "surface-dim": "#051424",
+                        "on-secondary-container": "#00344e",
+                        "tertiary": "#ffb695",
+                        "on-primary": "#1d00a5",
+                        "on-tertiary-container": "#ffd2be",
+                        "inverse-surface": "#d4e4fa",
+                        "background": "#051424",
+                        "surface-container-high": "#1c2b3c",
+                        "tertiary-container": "#a44100",
+                        "on-tertiary-fixed": "#351000",
+                        "outline": "#918fa1",
+                        "secondary": "#89ceff",
+                        "error-container": "#93000a",
+                        "secondary-fixed-dim": "#89ceff",
+                        "on-secondary-fixed-variant": "#004c6e",
+                        "primary": "#c3c0ff",
+                        "surface-container": "#122131",
+                        "secondary-container": "#00a2e6",
+                        "surface-tint": "#c3c0ff",
+                        "surface-container-lowest": "#010f1f",
+                        "surface-bright": "#2c3a4c",
+                        "inverse-on-surface": "#233143",
+                        "tertiary-fixed-dim": "#ffb695",
+                        "on-primary-fixed-variant": "#3323cc",
+                        "on-secondary-fixed": "#001e2f"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "2xl": "64px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "xl": "40px",
+                        "sm": "8px",
+                        "base_unit": "4px",
+                        "gutter": "24px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Outfit"],
+                        "headline-md": ["Outfit"],
+                        "display-lg-mobile": ["Outfit"],
+                        "label-md": ["Inter"],
+                        "display-lg": ["Outfit"],
+                        "label-xs": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display-lg-mobile": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-xs": ["12px", {"lineHeight": "1", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #051424;
+            color: #d4e4fa;
+            font-family: 'Inter', sans-serif;
+        }
+        .font-display { font-family: 'Outfit', sans-serif; }
+        .glass-panel {
+            background: rgba(18, 33, 49, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .indigo-glow:focus {
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+            border-color: #4f46e5;
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-2xl">
+<!-- TopAppBar Shell (Suppressed Navigation for Task Focus) -->
+<header class="bg-surface-container/80 backdrop-blur-xl dark:bg-surface-container/80 docked full-width top-0 border-b border-white/10 shadow-md flex justify-between items-center px-lg py-md w-full sticky top-0 z-50">
+<div class="flex items-center gap-md">
+<button aria-label="Geri" class="p-sm hover:bg-primary/10 rounded-full transition-colors text-primary">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-display-lg text-display-lg font-bold text-primary dark:text-primary tracking-tight">Linkbox</h1>
+</div>
+<div class="flex items-center gap-md">
+<button class="hidden md:flex items-center gap-xs px-md py-sm bg-primary-container text-on-primary-container rounded-xl font-label-md text-label-md hover:opacity-90 transition-all active:scale-95">
+<span class="material-symbols-outlined">add</span>
+                Yeni Link Ekle
+            </button>
+<div class="w-10 h-10 rounded-full border border-primary/30 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional studio portrait of a technology enthusiast user with a clean, modern aesthetic. The lighting is dramatic and cool-toned, reflecting a tech-indigo environment. The background is a blurred digital workspace with soft purple and blue ambient lighting, fitting the Linkbox brand identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKtKeVsGsrAV_0UdDA70ZpzB3e8UYIOIZnvTqAT2VPHkjg_O43SDh5a_asujYEQv_CLeV8UgwjWiaC-QwAZSTZUiUxMHOyl8d1s23Jy9B6gBtTfa8XExWTuNudsuxxSbv9m5rgoEDubDkhq_29FamWpjjyDCd-wXx2nvN-D2bjpCRmn0aBtBpLOSl3DQq-lwyAOxYtwIs39sqvNiqEBUarIIO5xDyeW99rNRo1Hi3VtsA3frmRys7BwvsLSxhL3LZGu80uR57hXg"/>
+</div>
+</div>
+</header>
+<main class="max-w-[1280px] mx-auto px-md md:px-lg mt-xl">
+<!-- Breadcrumb / Task Title -->
+<nav class="mb-lg flex items-center gap-sm text-on-surface-variant font-label-md text-label-md">
+<span>Tüm Linkler</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="text-primary">Detay Görünümü</span>
+</nav>
+<!-- Responsive Container -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-xl items-start">
+<!-- Left: Preview Image -->
+<div class="relative group">
+<div class="aspect-video w-full rounded-2xl overflow-hidden glass-panel">
+<img class="w-full h-full object-cover" data-alt="A high-fidelity 3D visualization of abstract JavaScript syntax floating in a digital space. The scene uses deep indigo and violet colors with glowing lines representing data connections. Sleek glass-like geometric shapes reflect the 'Tech Indigo Modern' theme of Linkbox, creating a sophisticated developer-focused visual." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAV8W0Qj2a6GKU4zf3PQUWc9vd0vJXSYCqiuvoTv0F8Givy6qpwwHLUkMttHClOgGeg-_6M6EWXtcY9bynvK8MqBVXzXwJUOAx5SC_5ncEnma-VTrVkmlnJu5fzBAQs0oFyC7z_Vye-TLurZ3T5OThAq0uNZat5ljylPKsqmfoBNnv20cfJhG6WTAiHHKEgTD4OpnAhh0Gokyn_TQppcL4ntVnhLMzsJ72-QY0fjioKJUMTo6EUAbspQ42aU3siVgBA8VzdYtnLEA"/>
+</div>
+<div class="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl flex items-end p-lg">
+<button class="flex items-center gap-sm bg-surface-container-high/90 backdrop-blur text-primary px-md py-sm rounded-lg font-label-md text-label-md">
+<span class="material-symbols-outlined">zoom_in</span>
+                        Önizlemeyi Büyüt
+                    </button>
+</div>
+</div>
+<!-- Right: Details -->
+<div class="flex flex-col gap-lg">
+<!-- Title & Meta -->
+<section>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-sm">Modern JavaScript Frameworkleri Analizi</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                        Bu makale, modern JavaScript framework'leri hakkında derinlemesine bir analiz sunuyor. Performans karşılaştırmaları, mimari farklar ve gelecek trendleri üzerine detaylı bilgiler içerir.
+                    </p>
+</section>
+<!-- URL Field -->
+<section class="flex flex-col gap-sm">
+<label class="font-label-md text-label-md text-primary">Bağlantı Adresi</label>
+<div class="flex items-center gap-sm bg-surface-container-low border border-white/10 rounded-xl p-md group transition-all focus-within:border-primary/50">
+<span class="material-symbols-outlined text-on-surface-variant">link</span>
+<input class="bg-transparent border-none focus:ring-0 text-on-surface-variant font-body-sm text-body-sm flex-1 truncate" readonly="" type="text" value="https://example.com/js-frameworks-analysis"/>
+<button class="p-sm hover:bg-primary/10 rounded-lg text-primary transition-colors flex items-center gap-xs" onclick="navigator.clipboard.writeText('https://example.com/js-frameworks-analysis')">
+<span class="material-symbols-outlined text-md">content_copy</span>
+<span class="hidden sm:inline font-label-xs text-label-xs">Kopyala</span>
+</button>
+</div>
+</section>
+<!-- Tags Section -->
+<section class="flex flex-col gap-sm">
+<div class="flex justify-between items-center">
+<label class="font-label-md text-label-md text-primary">Etiketler</label>
+<span class="font-label-xs text-label-xs text-on-surface-variant">3 Etiket</span>
+</div>
+<div class="flex flex-wrap gap-sm p-md bg-surface-container-low border border-white/10 rounded-xl">
+<!-- Chip -->
+<div class="flex items-center gap-xs bg-primary/10 border border-primary/20 text-primary px-sm py-xs rounded-full font-label-xs text-label-xs uppercase tracking-wider">
+                            #Yazılım
+                            <button class="flex items-center hover:text-white"><span class="material-symbols-outlined text-xs">close</span></button>
+</div>
+<!-- Chip -->
+<div class="flex items-center gap-xs bg-primary/10 border border-primary/20 text-primary px-sm py-xs rounded-full font-label-xs text-label-xs uppercase tracking-wider">
+                            #JavaScript
+                            <button class="flex items-center hover:text-white"><span class="material-symbols-outlined text-xs">close</span></button>
+</div>
+<!-- Chip -->
+<div class="flex items-center gap-xs bg-primary/10 border border-primary/20 text-primary px-sm py-xs rounded-full font-label-xs text-label-xs uppercase tracking-wider">
+                            #Eğitim
+                            <button class="flex items-center hover:text-white"><span class="material-symbols-outlined text-xs">close</span></button>
+</div>
+<input class="bg-transparent border-none focus:ring-0 text-on-surface p-0 px-xs font-body-sm text-body-sm min-w-[120px]" placeholder="Yeni etiket ekle..." type="text"/>
+</div>
+</section>
+<!-- Action Buttons -->
+<section class="flex flex-wrap items-center gap-md pt-md border-t border-white/5">
+<button class="flex-1 md:flex-none flex items-center justify-center gap-sm bg-primary-container text-on-primary-container px-xl py-md rounded-xl font-label-md text-label-md hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">save</span>
+                        Kaydet
+                    </button>
+<button class="flex-1 md:flex-none flex items-center justify-center gap-sm border border-outline-variant text-on-surface px-xl py-md rounded-xl font-label-md text-label-md hover:bg-surface-container-high active:scale-95 transition-all">
+<span class="material-symbols-outlined">open_in_new</span>
+                        Aç
+                    </button>
+<button class="flex-1 md:flex-none flex items-center justify-center gap-sm text-error px-xl py-md rounded-xl font-label-md text-label-md hover:bg-error/10 active:scale-95 transition-all ml-auto">
+<span class="material-symbols-outlined">delete</span>
+                        Sil
+                    </button>
+</section>
+<!-- Status / Info -->
+<div class="mt-xl grid grid-cols-2 gap-md p-md glass-panel rounded-2xl">
+<div class="flex flex-col gap-xs">
+<span class="text-on-surface-variant font-label-xs text-label-xs">Koleksiyon</span>
+<div class="flex items-center gap-xs text-on-surface">
+<span class="material-symbols-outlined text-sm text-primary">folder</span>
+<span class="font-label-md text-label-md">Okunacaklar</span>
+</div>
+</div>
+<div class="flex flex-col gap-xs">
+<span class="text-on-surface-variant font-label-xs text-label-xs">Önem Derecesi</span>
+<div class="flex items-center gap-xs text-on-surface">
+<span class="material-symbols-outlined text-sm text-tertiary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-label-md">Sık Kullanılan</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="mt-2xl py-lg border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-md">
+<div class="flex items-center gap-sm text-on-surface-variant font-label-xs text-label-xs">
+<span class="material-symbols-outlined text-sm">history</span>
+                Son güncelleme: 12 Temmuz 2026
+            </div>
+<div class="flex items-center gap-xl text-on-surface-variant font-label-xs text-label-xs uppercase tracking-widest">
+<a class="hover:text-primary transition-colors" href="#">Kullanım Koşulları</a>
+<a class="hover:text-primary transition-colors" href="#">Gizlilik</a>
+<span class="text-outline-variant">Linkbox v2.4.0</span>
+</div>
+</footer>
+</main>
+<!-- Contextual Micro-interaction Script -->
+<script>
+        // Simple scale and feedback for action buttons
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mousedown', () => {
+                btn.classList.add('scale-95');
+            });
+            btn.addEventListener('mouseup', () => {
+                btn.classList.remove('scale-95');
+            });
+        });
+
+        // Copy feedback
+        function showCopyFeedback(btn) {
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined text-md">check</span><span class="hidden sm:inline font-label-xs text-label-xs">Kopyalandı</span>';
+            btn.classList.add('text-secondary');
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.classList.remove('text-secondary');
+            }, 2000);
+        }
+        
+        document.querySelector('button[onclick*="navigator.clipboard"]').addEventListener('click', function() {
+            showCopyFeedback(this);
+        });
+    </script>
+</body></html>
