@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Linkbox | Dijital Kütüphane</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Inter:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Outfit:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#351000",
+                        "on-surface": "#d4e4fa",
+                        "surface-dim": "#051424",
+                        "inverse-surface": "#d4e4fa",
+                        "primary-fixed-dim": "#c3c0ff",
+                        "surface-container-low": "#0d1c2d",
+                        "primary": "#c3c0ff",
+                        "on-primary-fixed": "#0f0069",
+                        "primary-container": "#4f46e5",
+                        "on-tertiary": "#571f00",
+                        "on-secondary-fixed": "#001e2f",
+                        "surface-container": "#122131",
+                        "background": "#051424",
+                        "error": "#ffb4ab",
+                        "error-container": "#93000a",
+                        "on-error": "#690005",
+                        "surface-container-lowest": "#010f1f",
+                        "on-primary-container": "#dad7ff",
+                        "on-secondary": "#00344d",
+                        "secondary-container": "#00a2e6",
+                        "primary-fixed": "#e2dfff",
+                        "secondary": "#89ceff",
+                        "surface-bright": "#2c3a4c",
+                        "on-tertiary-container": "#ffd2be",
+                        "on-background": "#d4e4fa",
+                        "on-primary": "#1d00a5",
+                        "tertiary-fixed": "#ffdbcc",
+                        "outline": "#918fa1",
+                        "inverse-primary": "#4d44e3",
+                        "tertiary": "#ffb695",
+                        "on-secondary-fixed-variant": "#004c6e",
+                        "surface-tint": "#c3c0ff",
+                        "on-secondary-container": "#00344e",
+                        "inverse-on-surface": "#233143",
+                        "on-tertiary-fixed-variant": "#7b2f00",
+                        "secondary-fixed-dim": "#89ceff",
+                        "surface-variant": "#273647",
+                        "secondary-fixed": "#c9e6ff",
+                        "on-primary-fixed-variant": "#3323cc",
+                        "outline-variant": "#464555",
+                        "surface-container-high": "#1c2b3c",
+                        "surface-container-highest": "#273647",
+                        "on-surface-variant": "#c7c4d8",
+                        "on-error-container": "#ffdad6",
+                        "surface": "#051424",
+                        "tertiary-container": "#a44100",
+                        "tertiary-fixed-dim": "#ffb695"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "2xl": "64px",
+                        "gutter": "24px",
+                        "xs": "4px",
+                        "container-max": "1280px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "xl": "40px",
+                        "base_unit": "4px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Outfit"],
+                        "display-lg-mobile": ["Outfit"],
+                        "headline-sm": ["Outfit"],
+                        "body-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-md": ["Outfit"],
+                        "label-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-xs": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #051424;
+            font-family: 'Inter', sans-serif;
+            color: #d4e4fa;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-effect {
+            backdrop-filter: blur(12px);
+            background: rgba(18, 33, 49, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .indigo-gradient-btn {
+            background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .indigo-gradient-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+        .indigo-gradient-btn:active {
+            transform: scale(0.98);
+        }
+        .card-glow:hover {
+            border-color: rgba(79, 70, 229, 0.4);
+            box-shadow: 0 0 20px rgba(79, 70, 229, 0.1);
+        }
+        .sidebar-active-indicator {
+            position: absolute;
+            left: 0;
+            width: 3px;
+            height: 24px;
+            background-color: #c3c0ff;
+            border-radius: 0 4px 4px 0;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col overflow-x-hidden">
+<!-- Top Navigation (Mobile Bottom Nav is separated) -->
+<header class="sticky top-0 z-50 flex justify-between items-center px-lg py-md w-full bg-surface-container/80 backdrop-blur-xl dark:bg-surface-container/80 border-b border-white/10 shadow-md">
+<div class="flex items-center gap-md">
+<span class="font-display-lg text-display-lg font-bold text-primary dark:text-primary tracking-tight">Linkbox</span>
+<div class="hidden md:flex ml-xl gap-lg">
+<nav class="flex items-center gap-lg">
+<a class="text-primary border-b-2 border-primary font-bold font-label-md text-label-md pb-1" href="#">Tüm Linkler</a>
+<a class="text-on-surface-variant font-medium font-label-md text-label-md hover:text-primary transition-colors" href="#">Sık Kullanılanlar</a>
+</nav>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="indigo-gradient-btn hidden md:flex items-center gap-sm px-lg py-sm rounded-xl font-label-md text-label-md text-white" onclick="openModal()">
+<span class="material-symbols-outlined">add</span>
+                Yeni Link Ekle
+            </button>
+<div class="relative group">
+<button class="flex items-center gap-sm p-1 rounded-full border border-white/10 hover:bg-white/5 transition-all">
+<img class="w-8 h-8 rounded-full object-cover" data-alt="A professional studio portrait of a tech-focused user with soft, directional lighting. The person wears minimalist dark clothing against a deep indigo background. The image has a clean, high-contrast aesthetic with sharp focus on the face, reflecting a modern corporate digital identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqaY_PuMluNsaRogWboHEc2fGddBzd6at6BiB5PU_XmB8QwHxzhrpEYEdHlZ55rlfVbNQpscrKepu1GARZqOPivxVKWR9627WZEq5wd14QA1OzBi9eina3qARVoPhnGjo8URzqrLVYcoFNlXWTKFoX_ooFry4GPSUBxnL_Iz4gjwmUWp0HrMtsS2suDK3Mu-yn3kv__60Yn_t0Lb5QD720BNad0ml56sE7Jc4wwIvpKTq_jWN428ywR4nonNi9x9OmWr0csM6UjQ"/>
+<span class="hidden md:block text-label-md font-label-md pr-sm">user@example.com</span>
+</button>
+<!-- Dropdown -->
+<div class="absolute right-0 top-full mt-sm w-48 glass-effect rounded-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 shadow-2xl p-sm">
+<a class="flex items-center gap-sm px-md py-sm hover:bg-white/5 rounded-lg text-body-sm font-body-sm" href="#">
+<span class="material-symbols-outlined text-sm">settings</span> Ayarlar
+                    </a>
+<hr class="border-white/5 my-sm"/>
+<a class="flex items-center gap-sm px-md py-sm text-error hover:bg-error/10 rounded-lg text-body-sm font-body-sm" href="#">
+<span class="material-symbols-outlined text-sm">logout</span> Çıkış Yap
+                    </a>
+</div>
+</div>
+</div>
+</header>
+<div class="flex flex-1 relative">
+<!-- Sidebar Navigation (Desktop) -->
+<aside class="fixed left-0 top-0 h-full w-[280px] hidden md:flex flex-col pt-2xl bg-surface-container-low dark:bg-surface-container-low border-r border-white/10 z-40 mt-[72px]">
+<div class="px-lg mb-xl">
+<p class="text-on-surface-variant font-label-md text-label-md uppercase tracking-widest opacity-50">Kütüphane</p>
+</div>
+<nav class="flex flex-col">
+<a class="flex items-center gap-md bg-primary/10 text-primary border-l-4 border-primary px-lg py-md transition-all" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="font-label-md text-label-md">Tüm Linkler</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-lg py-md hover:bg-surface-container-highest hover:text-on-surface transition-all" href="#">
+<span class="material-symbols-outlined">star</span>
+<span class="font-label-md text-label-md">Sık Kullanılanlar</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-lg py-md hover:bg-surface-container-highest hover:text-on-surface transition-all" href="#">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="font-label-md text-label-md">Okunacaklar</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-lg py-md hover:bg-surface-container-highest hover:text-on-surface transition-all" href="#">
+<span class="material-symbols-outlined">archive</span>
+<span class="font-label-md text-label-md">Arşiv</span>
+</a>
+</nav>
+<div class="mt-auto pb-2xl flex flex-col">
+<a class="flex items-center gap-md text-on-surface-variant px-lg py-md hover:bg-surface-container-highest hover:text-on-surface transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Ayarlar</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant px-lg py-md hover:bg-surface-container-highest hover:text-on-surface transition-all" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md text-label-md">Yardım</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-[280px] p-md md:p-xl mb-24 md:mb-0">
+<!-- Search & Filters -->
+<section class="max-w-container-max mx-auto mb-xl">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-md mb-lg">
+<div class="relative flex-1 max-w-2xl">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full pl-xl pr-md py-md bg-surface-container rounded-xl border border-white/10 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 outline-none transition-all text-body-md font-body-md" placeholder="Tam metin ara..." type="text"/>
+</div>
+<div class="flex flex-wrap gap-sm">
+<button class="px-md py-sm rounded-full bg-primary/10 border border-primary/20 text-primary font-label-md text-label-md">#tümü</button>
+<button class="px-md py-sm rounded-full bg-surface-container border border-white/10 text-on-surface-variant hover:border-primary/50 transition-all font-label-md text-label-md">#çalışma</button>
+<button class="px-md py-sm rounded-full bg-surface-container border border-white/10 text-on-surface-variant hover:border-primary/50 transition-all font-label-md text-label-md">#eğitim</button>
+<button class="px-md py-sm rounded-full bg-surface-container border border-white/10 text-on-surface-variant hover:border-primary/50 transition-all font-label-md text-label-md">#eğlence</button>
+<button class="px-md py-sm rounded-full bg-surface-container border border-white/10 text-on-surface-variant hover:border-primary/50 transition-all font-label-md text-label-md">#yazılım</button>
+</div>
+</div>
+</section>
+<!-- Link Grid -->
+<section class="max-w-container-max mx-auto">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-gutter">
+<!-- Card 1 -->
+<div class="group glass-effect rounded-xl overflow-hidden card-glow transition-all flex flex-col">
+<div class="relative h-40 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A high-quality website preview of the Tailwind CSS official documentation website, showcasing vibrant indigo and teal utility classes on a dark interface. The image is crisp, professional, and reflects a modern developer environment with clean code blocks and aesthetic typography. The mood is sophisticated and technical." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0cvhn0-hYIFIr2jiFQBaZnneQfgl27SwFFnnvvrN2-rRmRroAEUKFxdpHI5PWLFpvQG7_mPGZDmFWd8jnkvogVGLeK9UdDQsfILma6WOsuQe9S4sEjtqFh9EEzjR3z1Lceh_d8RbRv19VQaUQ2Rx6M_thRc_QT8ykns2_PdaOwgKZ8PZLRp02MVSY8_XVl8Q1zjkNvxmf8EuZoM8YzJQ_SNuQ-Up29DN_Bk2zPAdWe9otjFOHYRPmRuObCGRtGPJgQWQhW-58Sw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-end p-sm gap-sm">
+<button class="p-sm bg-surface-container rounded-lg border border-white/10 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-sm bg-surface-container rounded-lg border border-white/10 hover:text-error transition-colors">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+<div class="p-md flex flex-col flex-1">
+<div class="flex justify-between items-start gap-sm mb-xs">
+<h3 class="font-headline-sm text-headline-sm line-clamp-1">Tailwind CSS Dokümantasyonu</h3>
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="text-on-surface-variant text-body-sm font-body-sm mb-md flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">link</span>
+                                tailwindcss.com
+                            </p>
+<div class="mt-auto flex flex-wrap gap-xs">
+<span class="px-xs py-[2px] bg-primary/10 border border-primary/20 text-primary rounded text-[10px] uppercase font-bold tracking-wider">#yazılım</span>
+<span class="px-xs py-[2px] bg-primary/10 border border-primary/20 text-primary rounded text-[10px] uppercase font-bold tracking-wider">#tasarım</span>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group glass-effect rounded-xl overflow-hidden card-glow transition-all flex flex-col">
+<div class="relative h-40 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A conceptual 3D render representing modern UI trends of 2024, featuring frosted glass layers, soft neon indigo glows, and fluid organic shapes. The aesthetic is ultra-modern and premium, with a focus on depth and lighting effects. The image feels inspirational, clean, and futuristic, following professional design standards." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBF9jY2j5HkAA6VY7zY01Ea1-w-snv9GYJAvydSYgDv_dcF9Ek8t85v6tWSbazUAs--b8DHQfN2322bPO7t9fRawyWOr8yDgvGkXNQOTwPEmETJwAWPKOwULTNSQB55zDNKlaW51ao7C5-qK3rxhs_tn_PCnvrf_CoBJDlQZHYkpB5Xvk91KfeNnwKFIfBIgrMmRs7nsL7zQpQ9dkukiJn4GXxRQj1jJF2DDJAmhkTFuhUmWBr_Aa7z3TAnWkXAWgTE1-bbeHL7VQ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-end p-sm gap-sm">
+<button class="p-sm bg-surface-container rounded-lg border border-white/10 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-sm bg-surface-container rounded-lg border border-white/10 hover:text-error transition-colors">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+<div class="p-md flex flex-col flex-1">
+<h3 class="font-headline-sm text-headline-sm line-clamp-1 mb-xs">Modern UI Trendleri 2024</h3>
+<p class="text-on-surface-variant text-body-sm font-body-sm mb-md flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">link</span>
+                                uidesigndaily.com
+                            </p>
+<div class="mt-auto flex flex-wrap gap-xs">
+<span class="px-xs py-[2px] bg-primary/10 border border-primary/20 text-primary rounded text-[10px] uppercase font-bold tracking-wider">#tasarım</span>
+<span class="px-xs py-[2px] bg-primary/10 border border-primary/20 text-primary rounded text-[10px] uppercase font-bold tracking-wider">#eğitim</span>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="group glass-effect rounded-xl overflow-hidden card-glow transition-all flex flex-col">
+<div class="relative h-40 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A sophisticated digital visualization of neural networks and floating AI data nodes in a dark space. The color palette consists of deep blues and vibrant indigos with sharp, glowing connections. The composition is dynamic and tech-heavy, representing the cutting edge of artificial intelligence technology and tools." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD334wzA_XJNhY6lJx-kcdH8wXtavCXPxMSPjCPQqXxuGeOdcuJTbT45ErLk-qYYT4g4EJav1yGkjIrVeczY80UTiCqruw5pxZKNQnEsSQI8jcUBZR91pLtlsCxl2HkD-V-1hHPjcTvJ35JTGYtDqXSPngEIQYwTbK_CaEpTLT9qsb3ght87AFVEKFz9xtG4gICWWHYbBNR44LhFgrYrq0o0e1HzO_ikhxUKSbaEGJmUvN01hmL05AkNYielUTw5lULfSD9-FbSCg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-end p-sm gap-sm">
+<button class="p-sm bg-surface-container rounded-lg border border-white/10 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-sm bg-surface-container rounded-lg border border-white/10 hover:text-error transition-colors">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+<div class="p-md flex flex-col flex-1">
+<h3 class="font-headline-sm text-headline-sm line-clamp-1 mb-xs">Yapay Zeka Araçları Listesi</h3>
+<p class="text-on-surface-variant text-body-sm font-body-sm mb-md flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">link</span>
+                                futurepedia.io
+                            </p>
+<div class="mt-auto flex flex-wrap gap-xs">
+<span class="px-xs py-[2px] bg-primary/10 border border-primary/20 text-primary rounded text-[10px] uppercase font-bold tracking-wider">#çalışma</span>
+<span class="px-xs py-[2px] bg-primary/10 border border-primary/20 text-primary rounded text-[10px] uppercase font-bold tracking-wider">#teknoloji</span>
+</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="group glass-effect rounded-xl overflow-hidden card-glow transition-all flex flex-col">
+<div class="relative h-40 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A minimalist overhead shot of a clean workspace featuring a sleek tablet displaying digital newsletters, a cup of coffee, and soft ambient morning light through a window. The style is contemporary and lifestyle-oriented, using a palette of soft grays and muted indigo tones. The image conveys a calm, organized feeling of staying informed." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkz6RRP_VdVq0jyc2Iyr8KIHj8KcwviVWGrpD_ipTh-hTIOOQO7Z9Z-B4ADIQDgpz6ZgWQQQnONxFsogZoHTODmLFl1c8G3vECJ_u_D79qSrNFRl_DC1tXOplCM1BOkhSEQ4c4ThDzDJRVqLtQFV7DTIwEZWgZFKn9Uck0YwNjM_Xqr3rrVCdUxb5aGuJPj31iMq5wUOEQmhLugFkplQLEA8sWM6_O87ljXy2LIbKR-dOMxCv3xuKYwM-x99-aB3rc8lWupBvUwQ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-end p-sm gap-sm">
+<button class="p-sm bg-surface-container rounded-lg border border-white/10 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-sm bg-surface-container rounded-lg border border-white/10 hover:text-error transition-colors">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+<div class="p-md flex flex-col flex-1">
+<h3 class="font-headline-sm text-headline-sm line-clamp-1 mb-xs">Haftalık Haber Bülteni</h3>
+<p class="text-on-surface-variant text-body-sm font-body-sm mb-md flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">link</span>
+                                medium.com
+                            </p>
+<div class="mt-auto flex flex-wrap gap-xs">
+<span class="px-xs py-[2px] bg-primary/10 border border-primary/20 text-primary rounded text-[10px] uppercase font-bold tracking-wider">#eğlence</span>
+<span class="px-xs py-[2px] bg-primary/10 border border-primary/20 text-primary rounded text-[10px] uppercase font-bold tracking-wider">#okuma</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Pagination Footer -->
+<footer class="mt-2xl flex flex-col sm:flex-row items-center justify-between gap-md pb-xl">
+<p class="text-on-surface-variant font-body-sm text-body-sm">Toplam <span class="text-primary font-bold">42</span> link gösteriliyor</p>
+<div class="flex items-center gap-sm">
+<button class="px-lg py-sm rounded-lg glass-effect hover:bg-white/5 transition-all text-label-md font-label-md disabled:opacity-50" disabled="">Önceki</button>
+<div class="flex items-center gap-xs">
+<button class="w-10 h-10 rounded-lg bg-primary text-on-primary font-bold">1</button>
+<button class="w-10 h-10 rounded-lg hover:bg-white/5 transition-all">2</button>
+<button class="w-10 h-10 rounded-lg hover:bg-white/5 transition-all">3</button>
+</div>
+<button class="px-lg py-sm rounded-lg glass-effect hover:bg-white/5 transition-all text-label-md font-label-md">Sonraki</button>
+</div>
+</footer>
+</section>
+</main>
+</div>
+<!-- Mobile Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-md pb-safe py-sm md:hidden bg-surface-container-highest dark:bg-surface-container-highest border-t border-white/10 shadow-lg rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-primary bg-primary/10 rounded-xl p-sm scale-90 transition-all" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-xs text-[10px]">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-sm hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="font-label-xs text-[10px]">Keşfet</span>
+</a>
+<button class="flex flex-col items-center justify-center -mt-8 bg-primary-container text-white w-14 h-14 rounded-full shadow-2xl border-4 border-surface-container-highest" onclick="openModal()">
+<span class="material-symbols-outlined">add</span>
+</button>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-sm hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">label</span>
+<span class="font-label-xs text-[10px]">Etiketler</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-sm hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-xs text-[10px]">Profil</span>
+</a>
+</nav>
+<!-- Modal: Yeni Link Ekle -->
+<div class="fixed inset-0 z-[100] hidden flex items-center justify-center px-md" id="addLinkModal">
+<div class="absolute inset-0 bg-background/80 backdrop-blur-sm" onclick="closeModal()"></div>
+<div class="relative w-full max-w-lg glass-effect rounded-2xl shadow-2xl overflow-hidden translate-y-8 transition-all duration-300" id="modalContainer">
+<div class="px-xl py-lg border-b border-white/10 flex justify-between items-center">
+<h2 class="font-headline-md text-headline-md">Yeni Link Ekle</h2>
+<button class="p-sm hover:bg-white/5 rounded-full transition-all" onclick="closeModal()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<form class="p-xl space-y-lg">
+<div class="space-y-sm">
+<label class="block text-label-md font-label-md text-on-surface-variant">URL</label>
+<input class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-md focus:border-primary/50 focus:ring-2 focus:ring-primary/20 outline-none text-body-md font-body-md" placeholder="https://example.com" type="url"/>
+</div>
+<div class="space-y-sm">
+<label class="block text-label-md font-label-md text-on-surface-variant">Başlık</label>
+<input class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-md focus:border-primary/50 focus:ring-2 focus:ring-primary/20 outline-none text-body-md font-body-md" placeholder="Link başlığı..." type="text"/>
+</div>
+<div class="space-y-sm">
+<label class="block text-label-md font-label-md text-on-surface-variant">Açıklama</label>
+<textarea class="w-full bg-surface-container border border-white/10 rounded-xl px-md py-md focus:border-primary/50 focus:ring-2 focus:ring-primary/20 outline-none text-body-md font-body-md resize-none" placeholder="Kısa bir not ekleyin..." rows="3"></textarea>
+</div>
+<div class="space-y-sm">
+<label class="block text-label-md font-label-md text-on-surface-variant">Etiketler</label>
+<div class="flex items-center gap-sm bg-surface-container border border-white/10 rounded-xl px-md py-sm">
+<span class="bg-primary/10 text-primary text-[10px] font-bold px-sm py-1 rounded">#tasarım</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md font-body-md p-0 flex-1" placeholder="Virgül ile ayırın..." type="text"/>
+</div>
+</div>
+<div class="pt-md flex gap-md">
+<button class="flex-1 py-md rounded-xl font-label-md text-label-md border border-white/10 hover:bg-white/5 transition-all" onclick="closeModal()" type="button">İptal</button>
+<button class="flex-1 py-md rounded-xl font-label-md text-label-md indigo-gradient-btn text-white" type="submit">Linki Kaydet</button>
+</div>
+</form>
+</div>
+</div>
+<script>
+        const modal = document.getElementById('addLinkModal');
+        const modalContainer = document.getElementById('modalContainer');
+
+        function openModal() {
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modalContainer.classList.remove('translate-y-8', 'opacity-0');
+            }, 10);
+        }
+
+        function closeModal() {
+            modalContainer.classList.add('translate-y-8');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // Close on ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // Simple button active effect simulation
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mousedown', () => {
+                btn.classList.add('scale-95');
+                setTimeout(() => btn.classList.remove('scale-95'), 100);
+            });
+        });
+    </script>
+</body></html>
