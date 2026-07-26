@@ -14,9 +14,9 @@
 
 **Purpose**: Next.js 14 projesi, tasarım token'ları ve test altyapısı
 
-- [ ] T001 Next.js 14 + TypeScript projesini repo kökünde elle kur: `package.json` (dev/build/start/test script'leri, next@14, react@18, typescript@5, tailwindcss@3, @supabase/supabase-js, @supabase/ssr, vitest), `tsconfig.json` (strict), `next.config.mjs`, `.gitignore` güncelle, `postcss.config.mjs`
-- [ ] T002 [P] Tasarım sistemini kur: `tailwind.config.ts` (docs/design/screen-1.html + screen-2.html'deki renk/spacing/radius/fontFamily/fontSize token'ları, darkMode class, breakpoint'ler), `app/globals.css` (Outfit+Inter font yüzleri next/font ile layout'ta; .glass-effect, .indigo-gradient-btn, .card-glow yardımcı sınıfları)
-- [ ] T003 [P] Vitest kur: `vitest.config.ts`, `npm test` script'i (`vitest run`), örnek boş test `tests/unit/smoke.test.ts`
+- [X] T001 Next.js 14 + TypeScript projesini repo kökünde elle kur: `package.json` (dev/build/start/test script'leri, next@14, react@18, typescript@5, tailwindcss@3, @supabase/supabase-js, @supabase/ssr, vitest), `tsconfig.json` (strict), `next.config.mjs`, `.gitignore` güncelle, `postcss.config.mjs`
+- [X] T002 [P] Tasarım sistemini kur: `tailwind.config.ts` (docs/design/screen-1.html + screen-2.html'deki renk/spacing/radius/fontFamily/fontSize token'ları, darkMode class, breakpoint'ler), `app/globals.css` (Outfit+Inter font yüzleri next/font ile layout'ta; .glass-effect, .indigo-gradient-btn, .card-glow yardımcı sınıfları)
+- [X] T003 [P] Vitest kur: `vitest.config.ts`, `npm test` script'i (`vitest run`), örnek boş test `tests/unit/smoke.test.ts`
 
 **Checkpoint**: `npm test && npx tsc --noEmit && npm run build` env'siz geçer → commit "kurulum: Next.js 14 iskeleti, tasarım token'ları, vitest"
 

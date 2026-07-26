@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Tasarım referansı: docs/design/screen-1.html + screen-2.html (Tech Indigo Modern) */
+
+body {
+  background-color: #051424;
+  color: #d4e4fa;
+  font-family: "Inter", sans-serif;
+}
+
+@layer components {
+  .glass-effect {
+    backdrop-filter: blur(12px);
+    background: rgba(18, 33, 49, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .indigo-gradient-btn {
+    background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .indigo-gradient-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+  }
+
+  .indigo-gradient-btn:active {
+    transform: scale(0.98);
+  }
+
+  .card-glow:hover {
+    border-color: rgba(79, 70, 229, 0.4);
+    box-shadow: 0 0 20px rgba(79, 70, 229, 0.1);
+  }
+}
