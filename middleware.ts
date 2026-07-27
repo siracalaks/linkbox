@@ -1,58 +1,42 @@
-import { createServerClient } from "@supabase/ssr";
-import { NextResponse, type NextRequest } from "next/server";
-import { getSupabaseEnv } from "@/lib/env";
+import NextAuth from "next-auth";
+import { NextResponse } from "next/server";
+import { authConfig } from "@/auth.config";
+import { isDatabaseConfigured } from "@/lib/env";
 
 /**
- * Auth gateway (FR-008, anayasa II): oturum çerezini tazeler, oturumsuz
- * istekleri /login'e yönlendirir. Env yoksa pas geçer (research D11) —
- * sayfalar "Veritabanı yapılandırması bekleniyor" durumunu gösterir.
+ * Auth gateway (FR-008): JWT oturumunu doğrular, oturumsuz istekleri
+ * /login'e yönlendirir. Env yoksa pas geçer (research D11) — sayfalar
+ * "Veritabanı yapılandırması bekleniyor" durumunu gösterir.
+ * Edge-uyumlu authConfig kullanılır (Prisma/bcrypt middleware'e girmez).
  */
-export async function middleware(request: NextRequest) {
-  const env = getSupabaseEnv();
-  if (!env) return NextResponse.next();
+const { auth } = NextAuth(authConfig);
 
-  let response = NextResponse.next({ request });
-
-  const supabase = createServerClient(env.url, env.anonKey, {
-    cookies: {
-      getAll() {
-        return request.cookies.getAll();
-      },
-      setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value }) =>
-          request.cookies.set(name, value)
-        );
-        response = NextResponse.next({ request });
-        cookiesToSet.forEach(({ name, value, options }) =>
-          response.cookies.set(name, value, options)
-        );
-      },
-    },
-  });
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+export default auth((request) => {
+  if (!isDatabaseConfigured()) return NextResponse.next();
 
   const path = request.nextUrl.pathname;
-  const isPublicPath = path.startsWith("/login") || path.startsWith("/auth");
+  const isPublicPath =
+    path.startsWith("/login") ||
+    path.startsWith("/api/auth") ||
+    path === "/api/health";
+  const isAuthenticated = Boolean(request.auth?.user);
 
-  if (!user && !isPublicPath) {
+  if (!isAuthenticated && !isPublicPath) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = "/login";
     loginUrl.search = "";
     return NextResponse.redirect(loginUrl);
   }
 
-  if (user && path.startsWith("/login")) {
+  if (isAuthenticated && path.startsWith("/login")) {
     const homeUrl = request.nextUrl.clone();
     homeUrl.pathname = "/";
     homeUrl.search = "";
     return NextResponse.redirect(homeUrl);
   }
 
-  return response;
-}
+  return NextResponse.next();
+});
 
 export const config = {
   matcher: [

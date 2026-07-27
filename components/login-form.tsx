@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import {
-  signInWithMagicLink,
   signInWithPassword,
   signUpWithPassword,
   type ActionResult,
@@ -10,7 +9,7 @@ import {
 
 type Feedback = { kind: "error" | "info"; text: string } | null;
 
-/** Giriş / kayıt / magic link formu (client). */
+/** Giriş / kayıt formu (client) — e-posta + şifre (Auth.js Credentials). */
 export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -65,6 +64,7 @@ export function LoginForm() {
           id="password"
           minLength={6}
           name="password"
+          required
           onChange={(event) => setPassword(event.target.value)}
           placeholder="••••••••"
           type="password"
@@ -93,24 +93,14 @@ export function LoginForm() {
         >
           Giriş Yap
         </button>
-        <div className="flex flex-col gap-md sm:flex-row">
-          <button
-            className="flex-1 rounded-xl border border-white/10 py-md text-label-md transition-all hover:bg-white/5 disabled:opacity-50"
-            disabled={isPending}
-            onClick={() => run(() => signUpWithPassword(email, password))}
-            type="button"
-          >
-            Kayıt Ol
-          </button>
-          <button
-            className="flex-1 rounded-xl border border-white/10 py-md text-label-md text-primary transition-all hover:bg-primary/10 disabled:opacity-50"
-            disabled={isPending || !email}
-            onClick={() => run(() => signInWithMagicLink(email))}
-            type="button"
-          >
-            Giriş bağlantısı gönder
-          </button>
-        </div>
+        <button
+          className="w-full rounded-xl border border-white/10 py-md text-label-md transition-all hover:bg-white/5 disabled:opacity-50"
+          disabled={isPending}
+          onClick={() => run(() => signUpWithPassword(email, password))}
+          type="button"
+        >
+          Kayıt Ol
+        </button>
       </div>
     </form>
   );
