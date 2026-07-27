@@ -24,6 +24,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen bg-background text-on-background antialiased">
         {children}
+        <footer className="py-md text-center text-label-xs text-on-surface-variant">
+          (c) 2026 Linkbox
+        </footer>
       </body>
     </html>
   );
