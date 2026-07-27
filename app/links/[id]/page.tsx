@@ -4,11 +4,11 @@ import { Header } from "@/components/header";
 import { LinkDetailForm } from "@/components/link-detail-form";
 import { MobileNav } from "@/components/mobile-nav";
 import { RealtimeRefresher } from "@/components/realtime-refresher";
-import { isSupabaseConfigured } from "@/lib/env";
+import { getSessionUser } from "@/auth";
+import { isDatabaseConfigured } from "@/lib/env";
 import { formatDateTr } from "@/lib/format";
 import { getLink, listTags } from "@/lib/queries";
 import { getPreviewUrl } from "@/lib/storage";
-import { getSessionUser } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +20,7 @@ export default async function LinkDetailPage({
 }: {
   params: { id: string };
 }) {
-  if (!isSupabaseConfigured()) {
+  if (!isDatabaseConfigured()) {
     return (
       <>
         <Header backHref="/" email={null} />
@@ -34,7 +34,10 @@ export default async function LinkDetailPage({
   const user = await getSessionUser();
   if (!user) redirect("/login");
 
-  const [link, tags] = await Promise.all([getLink(params.id), listTags()]);
+  const [link, tags] = await Promise.all([
+    getLink(user.id, params.id),
+    listTags(user.id),
+  ]);
   if (!link) notFound();
 
   const previewUrl = await getPreviewUrl(link.preview_path);
@@ -42,7 +45,7 @@ export default async function LinkDetailPage({
   return (
     <>
       <Header backHref="/" email={user.email ?? null} />
-      <RealtimeRefresher userId={user.id} />
+      <RealtimeRefresher />
       <main className="mx-auto mb-24 w-full max-w-container-max px-md pt-xl md:mb-0 md:px-lg">
         <nav aria-label="Sayfa yolu" className="mb-lg flex items-center gap-sm text-label-md text-on-surface-variant">
           <span>Tüm Linkler</span>

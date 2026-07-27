@@ -2,41 +2,30 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { getSupabaseBrowser } from "@/lib/supabase/client";
+
+/** Tazeleme aralığı (US4 — plan.md "Altyapı Değişimi" gerekçesi). */
+const REFRESH_INTERVAL_MS = 15_000;
 
 /**
- * Realtime aboneliği (FR-004, US4): kullanıcının kendi linklerindeki
- * INSERT/UPDATE/DELETE olaylarında server verisini tazeler.
- * Kanal `user_id=eq.<uid>` ile sınırlıdır (anayasa II — realtime izolasyonu).
- * Env yoksa hiçbir şey yapmaz (research D11).
+ * Periyodik tazeleme (FR-004, US4): Supabase Realtime yerine ~15 sn'de bir
+ * `router.refresh()` ile server verisi yenilenir — aynı hesabın diğer
+ * tarayıcılarındaki değişiklikler bir sonraki periyotta yansır.
+ * Sekme görünür değilken tazeleme atlanır (gereksiz istek yok).
  */
-export function RealtimeRefresher({ userId }: { userId: string }) {
+export function RealtimeRefresher() {
   const router = useRouter();
 
   useEffect(() => {
-    const supabase = getSupabaseBrowser();
-    if (!supabase) return;
-
-    const channel = supabase
-      .channel(`links-changes-${userId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "links",
-          filter: `user_id=eq.${userId}`,
-        },
-        () => {
-          router.refresh();
-        }
-      )
-      .subscribe();
+    const timer = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        router.refresh();
+      }
+    }, REFRESH_INTERVAL_MS);
 
     return () => {
-      supabase.removeChannel(channel);
+      clearInterval(timer);
     };
-  }, [router, userId]);
+  }, [router]);
 
   return null;
 }

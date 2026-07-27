@@ -1,9 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import type { SupabaseClient, User } from "@supabase/supabase-js";
+import { Prisma, type PrismaClient } from "@prisma/client";
+import { getSessionUser } from "@/auth";
+import { getDb } from "@/lib/db";
 import { DB_PENDING_MESSAGE } from "@/lib/env";
-import { getSupabaseServer } from "@/lib/supabase/server";
 import {
   DUPLICATE_LINK_MESSAGE,
   normalizeTags,
@@ -27,21 +28,26 @@ export interface UpdateLinkInput {
 
 type SessionContext =
   | { ok: false; error: string }
-  | { ok: true; supabase: SupabaseClient; user: User };
+  | { ok: true; db: PrismaClient; userId: string };
 
-/** Ortak ön koşul: env + oturum. */
+/** Ortak ön koşul: env + oturum. RLS yok — her sorgu userId ile daraltılır. */
 async function requireSession(): Promise<SessionContext> {
-  const supabase = getSupabaseServer();
-  if (!supabase) {
+  const db = getDb();
+  if (!db) {
     return { ok: false, error: DB_PENDING_MESSAGE };
   }
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getSessionUser();
   if (!user) {
     return { ok: false, error: "Oturum bulunamadı" };
   }
-  return { ok: true, supabase, user };
+  return { ok: true, db, userId: user.id };
+}
+
+function isUniqueViolation(error: unknown): boolean {
+  return (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === "P2002"
+  );
 }
 
 /**
@@ -49,62 +55,69 @@ async function requireSession(): Promise<SessionContext> {
  * (tags UNIQUE(user_id, name); contracts/server-actions.md).
  */
 async function upsertTags(
-  supabase: SupabaseClient,
+  db: PrismaClient,
   userId: string,
   tagNames: string[]
 ): Promise<{ ids: string[] } | { failure: string }> {
   if (tagNames.length === 0) return { ids: [] };
-  const { data, error } = await supabase
-    .from("tags")
-    .upsert(
-      tagNames.map((name) => ({ user_id: userId, name })),
-      { onConflict: "user_id,name", ignoreDuplicates: false }
-    )
-    .select("id, name");
-  if (error || !data) return { failure: "Etiketler kaydedilemedi" };
-  return { ids: data.map((tag) => tag.id) };
+  try {
+    const ids: string[] = [];
+    for (const name of tagNames) {
+      const tag = await db.tag.upsert({
+        where: { userId_name: { userId, name } },
+        create: { userId, name },
+        update: {},
+        select: { id: true },
+      });
+      ids.push(tag.id);
+    }
+    return { ids };
+  } catch {
+    return { failure: "Etiketler kaydedilemedi" };
+  }
 }
 
 /** Yeni link kaydeder (US1, FR-001/FR-002). */
 export async function createLink(input: CreateLinkInput): Promise<ActionResult> {
   const session = await requireSession();
   if (!session.ok) return session;
-  const { supabase, user } = session;
+  const { db, userId } = session;
 
   const urlCheck = validateUrl(input.url);
   if (!urlCheck.ok) return { ok: false, error: urlCheck.error };
   const tagsCheck = normalizeTags(input.tags);
   if (!tagsCheck.ok) return { ok: false, error: tagsCheck.error };
 
-  const { data: link, error } = await supabase
-    .from("links")
-    .insert({
-      user_id: user.id,
-      url: urlCheck.value,
-      title: input.title?.trim() || null,
-      description: input.description?.trim() || null,
-    })
-    .select("id")
-    .single();
-
-  if (error || !link) {
-    if (error?.code === "23505") {
+  let linkId: string;
+  try {
+    const link = await db.link.create({
+      data: {
+        userId,
+        url: urlCheck.value,
+        title: input.title?.trim() || null,
+        description: input.description?.trim() || null,
+      },
+      select: { id: true },
+    });
+    linkId = link.id;
+  } catch (error) {
+    if (isUniqueViolation(error)) {
       return { ok: false, error: DUPLICATE_LINK_MESSAGE };
     }
     return { ok: false, error: "Link kaydedilemedi" };
   }
 
-  const tagResult = await upsertTags(supabase, user.id, tagsCheck.value);
+  const tagResult = await upsertTags(db, userId, tagsCheck.value);
   if ("failure" in tagResult) return { ok: false, error: tagResult.failure };
   if (tagResult.ids.length > 0) {
-    const { error: linkTagError } = await supabase.from("link_tags").insert(
-      tagResult.ids.map((tagId) => ({
-        link_id: link.id,
-        tag_id: tagId,
-        user_id: user.id,
-      }))
-    );
-    if (linkTagError) return { ok: false, error: "Etiketler bağlanamadı" };
+    try {
+      await db.linkTag.createMany({
+        data: tagResult.ids.map((tagId) => ({ linkId, tagId, userId })),
+        skipDuplicates: true,
+      });
+    } catch {
+      return { ok: false, error: "Etiketler bağlanamadı" };
+    }
   }
 
   revalidatePath("/");
@@ -115,32 +128,33 @@ export async function createLink(input: CreateLinkInput): Promise<ActionResult> 
 export async function updateLink(input: UpdateLinkInput): Promise<ActionResult> {
   const session = await requireSession();
   if (!session.ok) return session;
-  const { supabase, user } = session;
+  const { db, userId } = session;
 
   const tagsCheck = normalizeTags(input.tags);
   if (!tagsCheck.ok) return { ok: false, error: tagsCheck.error };
 
-  const { data: updated, error } = await supabase
-    .from("links")
-    .update({
-      title: input.title?.trim() || null,
-      description: input.description?.trim() || null,
-    })
-    .eq("id", input.id)
-    .select("id")
-    .maybeSingle();
+  try {
+    const updated = await db.link.updateMany({
+      where: { id: input.id, userId },
+      data: {
+        title: input.title?.trim() || null,
+        description: input.description?.trim() || null,
+      },
+    });
+    if (updated.count === 0) return { ok: false, error: "Link bulunamadı" };
+  } catch {
+    return { ok: false, error: "Link bulunamadı" };
+  }
 
-  if (error || !updated) return { ok: false, error: "Link bulunamadı" };
-
-  const tagResult = await upsertTags(supabase, user.id, tagsCheck.value);
+  const tagResult = await upsertTags(db, userId, tagsCheck.value);
   if ("failure" in tagResult) return { ok: false, error: tagResult.failure };
   const desiredIds = new Set(tagResult.ids);
 
-  const { data: currentRows } = await supabase
-    .from("link_tags")
-    .select("tag_id")
-    .eq("link_id", input.id);
-  const currentIds = new Set((currentRows ?? []).map((row) => row.tag_id));
+  const currentRows = await db.linkTag.findMany({
+    where: { linkId: input.id, userId },
+    select: { tagId: true },
+  });
+  const currentIds = new Set(currentRows.map((row) => row.tagId));
 
   const toAdd = tagResult.ids.filter((id) => !currentIds.has(id));
   const toRemoveIds: string[] = [];
@@ -149,22 +163,23 @@ export async function updateLink(input: UpdateLinkInput): Promise<ActionResult> 
   });
 
   if (toAdd.length > 0) {
-    const { error: addError } = await supabase.from("link_tags").insert(
-      toAdd.map((tagId) => ({
-        link_id: input.id,
-        tag_id: tagId,
-        user_id: user.id,
-      }))
-    );
-    if (addError) return { ok: false, error: "Etiketler bağlanamadı" };
+    try {
+      await db.linkTag.createMany({
+        data: toAdd.map((tagId) => ({ linkId: input.id, tagId, userId })),
+        skipDuplicates: true,
+      });
+    } catch {
+      return { ok: false, error: "Etiketler bağlanamadı" };
+    }
   }
   if (toRemoveIds.length > 0) {
-    const { error: removeError } = await supabase
-      .from("link_tags")
-      .delete()
-      .eq("link_id", input.id)
-      .in("tag_id", toRemoveIds);
-    if (removeError) return { ok: false, error: "Etiketler güncellenemedi" };
+    try {
+      await db.linkTag.deleteMany({
+        where: { linkId: input.id, userId, tagId: { in: toRemoveIds } },
+      });
+    } catch {
+      return { ok: false, error: "Etiketler güncellenemedi" };
+    }
   }
 
   revalidatePath("/");
@@ -176,10 +191,13 @@ export async function updateLink(input: UpdateLinkInput): Promise<ActionResult> 
 export async function deleteLink(id: string): Promise<ActionResult> {
   const session = await requireSession();
   if (!session.ok) return session;
-  const { supabase } = session;
+  const { db, userId } = session;
 
-  const { error } = await supabase.from("links").delete().eq("id", id);
-  if (error) return { ok: false, error: "Link silinemedi" };
+  try {
+    await db.link.deleteMany({ where: { id, userId } });
+  } catch {
+    return { ok: false, error: "Link silinemedi" };
+  }
 
   revalidatePath("/");
   return { ok: true };

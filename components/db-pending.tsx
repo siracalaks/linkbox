@@ -1,8 +1,8 @@
 import { DB_PENDING_MESSAGE } from "@/lib/env";
 
 /**
- * Supabase env değişkenleri tanımlı değilken gösterilen sade durum
- * (research D11). Uygulama env'siz de derlenir ve açılır.
+ * DATABASE_URL tanımlı değilken gösterilen sade durum (research D11).
+ * Uygulama env'siz de derlenir ve açılır.
  */
 export function DbPending() {
   return (
@@ -17,7 +17,7 @@ export function DbPending() {
         {DB_PENDING_MESSAGE}
       </h2>
       <p className="max-w-md text-body-sm text-on-surface-variant">
-        Supabase ortam değişkenleri eklendiğinde uygulama otomatik olarak
+        DATABASE_URL ortam değişkeni eklendiğinde uygulama otomatik olarak
         çalışmaya başlayacak.
       </p>
     </div>

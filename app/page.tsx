@@ -9,10 +9,10 @@ import { RealtimeRefresher } from "@/components/realtime-refresher";
 import { SearchBar } from "@/components/search-bar";
 import { Sidebar } from "@/components/sidebar";
 import { TagFilter } from "@/components/tag-filter";
-import { isSupabaseConfigured } from "@/lib/env";
+import { getSessionUser } from "@/auth";
+import { isDatabaseConfigured } from "@/lib/env";
 import { listLinks, listTags } from "@/lib/queries";
 import { getPreviewUrlMap } from "@/lib/storage";
-import { getSessionUser } from "@/lib/supabase/server";
 
 // Env ve oturum her istekte kontrol edilir (research D11, D5: public cache yok).
 export const dynamic = "force-dynamic";
@@ -30,7 +30,7 @@ export default async function DashboardPage({
 }: {
   searchParams: DashboardSearchParams;
 }) {
-  if (!isSupabaseConfigured()) {
+  if (!isDatabaseConfigured()) {
     return (
       <>
         <Header email={null} />
@@ -50,8 +50,8 @@ export default async function DashboardPage({
   const hasQuery = Boolean(searchParams.q && searchParams.q.trim());
 
   const [result, tags] = await Promise.all([
-    listLinks({ q: searchParams.q, tagIds, cursor: searchParams.cursor }),
-    listTags(),
+    listLinks(user.id, { q: searchParams.q, tagIds, cursor: searchParams.cursor }),
+    listTags(user.id),
   ]);
 
   const isModalOpen = searchParams.new === "1";
@@ -65,7 +65,7 @@ export default async function DashboardPage({
   return (
     <>
       <Header email={user.email ?? null} />
-      <RealtimeRefresher userId={user.id} />
+      <RealtimeRefresher />
       <div className="flex flex-1">
         <Sidebar />
         <main className="mb-24 min-w-0 flex-1 p-md md:mb-0 md:p-xl">
