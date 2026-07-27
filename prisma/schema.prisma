@@ -1,0 +1,78 @@
+// Linkbox — kendi sunucu PostgreSQL şeması (Prisma).
+// Kaynak model: specs/001-linkbox/data-model.md (Supabase'den altyapı taşıması).
+// NOT: `search_vector tsvector` kolonu ve GIN indeksi Prisma modelinde DEĞİL,
+// prisma/migrations/0001_init/migration.sql içinde ham SQL olarak tanımlıdır
+// (Unsupported alan yerine raw SQL tercih edildi; trigger'lar günceller).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Uygulama kullanıcısı (Auth.js Credentials — e-posta + bcrypt şifre).
+model User {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  links    Link[]
+  tags     Tag[]
+  linkTags LinkTag[]
+
+  @@map("users")
+}
+
+/// Kaydedilen link (FR-001/FR-002; UNIQUE(user_id, url)).
+model Link {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  url         String
+  title       String?
+  description String?
+  previewPath String?  @map("preview_path")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz(3)
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  linkTags LinkTag[]
+
+  // FR-002: aynı kullanıcı aynı URL'yi ikinci kez ekleyemez
+  @@unique([userId, url], map: "links_user_url_unique")
+  // FR-010 / D9: keyset pagination (created_at, id) DESC
+  @@index([userId, createdAt(sort: Desc), id(sort: Desc)], map: "links_keyset_idx")
+  @@map("links")
+}
+
+/// Kullanıcıya özel etiket (D8; UNIQUE(user_id, name)).
+model Tag {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  name      String   @db.VarChar(50)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  linkTags LinkTag[]
+
+  @@unique([userId, name], map: "tags_user_name_unique")
+  @@map("tags")
+}
+
+/// Link ↔ etiket köprüsü (FR-009: (tag_id, link_id) bileşik indeks).
+model LinkTag {
+  linkId String @map("link_id") @db.Uuid
+  tagId  String @map("tag_id") @db.Uuid
+  userId String @map("user_id") @db.Uuid
+
+  link Link @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([linkId, tagId])
+  @@index([tagId, linkId], map: "link_tags_tag_link_idx")
+  @@map("link_tags")
+}
