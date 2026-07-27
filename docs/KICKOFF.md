@@ -29,4 +29,4 @@ kurmadıysan hiçbir dokümanda test iddiasında bulunma.
 
 ---
 
-Proje: Linkbox · Stack: nextjs_supabase · spec-kit v0.14.2
+Proje: Linkbox · Stack: nextjs + kendi sunucu PostgreSQL (Prisma + Auth.js) · spec-kit v0.14.2

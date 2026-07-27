@@ -4,6 +4,38 @@
 
 **Input**: Feature specification from `/specs/001-linkbox/spec.md`
 
+## Altyapı Değişimi (2026-07-27)
+
+Veri katmanı Supabase'den KENDİ SUNUCUDAKİ PostgreSQL'e taşındı. Bu bir
+altyapı değişimidir; spec.md'nin işlevsel gereksinimleri, UI ve tasarım
+aynen korunur. Kararlar:
+
+- **ORM**: Prisma (`prisma/schema.prisma`). Migration ELLE yazıldı
+  (`prisma/migrations/0001_init/migration.sql`; lokalde Postgres yok,
+  `prisma migrate dev` çalıştırılamaz). `search_vector tsvector` + GIN +
+  trigger'lar Prisma modelinde değil, migration'da ham SQL. Deploy'da
+  `npm start` → `prisma migrate deploy` tabloları otomatik kurar.
+- **Auth**: Supabase Auth yerine Auth.js (next-auth v5) Credentials —
+  e-posta + şifre (bcrypt hash, `users` tablosu), JWT session, adapter'sız.
+  Magic link kaldırıldı (harici e-posta servisi gerektirir; Credentials
+  akışı spec'in email/password varsayımını karşılar). AUTH_SECRET yoksa
+  dev fallback ile açılır; prod'da env beklenir.
+- **US4 / FR-004 (realtime)**: Supabase Realtime yerine basit periyodik
+  tazeleme — `RealtimeRefresher` ~15 sn'de bir `router.refresh()` çağırır
+  (sekme görünürken). Gerekçe: kendi sunucuda WebSocket/pub-sub altyapısı
+  kurmak MVP için YAGNI; işlevsel davranış (diğer oturumların kendiliğinden
+  güncellenmesi) korunur, SC-002'nin 2 sn hedefi bu MVP'de ~15 sn olarak
+  gevşetilir. Aynı sekmedeki mutasyonlar zaten `revalidatePath` ile anlıktır.
+- **RLS yerine uygulama katmanı izolasyonu**: `auth.uid()` politikaları
+  kalktı; TÜM sorgular/mutasyonlar server tarafında `userId` ile daraltılır
+  (`lib/queries.ts`, `app/actions/links.ts`). Service-role kavramı yok.
+- **Storage (FR-006)**: Supabase Storage kaldırıldı; upload UI zaten kapsam
+  dışıydı (D14). `preview_path` kolonu şemada korunur, depo yokken UI yer
+  tutucu ikon gösterir. Kendi sunucuda dosya deposu YAGNI.
+- **Env**: `NEXT_PUBLIC_SUPABASE_*` yerine `DATABASE_URL` (+ `AUTH_SECRET`).
+  D11 korunur: env'siz derlenir/açılır, "Veritabanı yapılandırması
+  bekleniyor" gösterilir; `/api/health` → `{ok, db:"connected"|"waiting"}`.
+
 ## Summary
 
 Kişisel link kaydetme/etiketleme uygulaması: kullanıcı link kaydeder (URL + opsiyonel başlık/açıklama + etiketler), etikete göre filtreler (AND mantığı), tam-metin arama yapar ve realtime güncellemeler alır. Teknik yaklaşım: Next.js 14 App Router + Supabase (Auth, Postgres+RLS, Realtime). Mutasyonlar server action, okuma server component; arama Postgres `tsvector` + GIN; sayfalama keyset. Supabase env değişkenleri OLMADAN da uygulama derlenir ve "Veritabanı yapılandırması bekleniyor" durumu gösterir (ilk deploy kısıtı). Deploy hedefi Coolify (nixpacks, `npm run build` + `npm start`).
