@@ -96,9 +96,22 @@ export function LinkCard({
           </span>
           <span className="truncate">{shortUrl(link.url)}</span>
         </p>
-        <p className="mb-md text-label-xs text-on-surface-variant/70">
-          {formatDateTr(link.created_at)}
-        </p>
+        <div className="mb-md flex items-center justify-between gap-sm">
+          <p className="text-label-xs text-on-surface-variant/70">
+            {formatDateTr(link.created_at)}
+          </p>
+          {link.note ? (
+            <span
+              aria-label={link.note.slice(0, 50)}
+              className="flex items-center text-primary/70"
+              title={link.note.slice(0, 50)}
+            >
+              <span aria-hidden="true" className="material-symbols-outlined text-[16px]">
+                sticky_note_2
+              </span>
+            </span>
+          ) : null}
+        </div>
         <div className="mt-auto flex flex-wrap gap-xs">
           {link.tags.map((tag) => (
             <span
