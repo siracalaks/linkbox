@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 import {
   INVALID_TAG_MESSAGE,
   INVALID_URL_MESSAGE,
+  NOTE_TOO_LONG_MESSAGE,
   normalizeTags,
   parseTagsInput,
+  validateNote,
   validateTagName,
   validateUrl,
 } from "@/lib/validation";
@@ -59,6 +61,29 @@ describe("normalizeTags", () => {
 
   it("geçersiz uzunlukta etiket varsa hata döner", () => {
     expect(normalizeTags(["ok", "a".repeat(51)]).ok).toBe(false);
+  });
+});
+
+describe("validateNote", () => {
+  it("boş/whitespace girdiyi null olarak kabul eder (Edge Case: not silme)", () => {
+    expect(validateNote("")).toEqual({ ok: true, value: null });
+    expect(validateNote("   ")).toEqual({ ok: true, value: null });
+  });
+
+  it("200 karaktere kadar kabul eder", () => {
+    const note = "a".repeat(200);
+    expect(validateNote(note)).toEqual({ ok: true, value: note });
+  });
+
+  it("200 karakterden uzun notu reddeder", () => {
+    expect(validateNote("a".repeat(201))).toEqual({
+      ok: false,
+      error: NOTE_TOO_LONG_MESSAGE,
+    });
+  });
+
+  it("baş/son boşlukları kırpar", () => {
+    expect(validateNote("  merhaba  ")).toEqual({ ok: true, value: "merhaba" });
   });
 });
 

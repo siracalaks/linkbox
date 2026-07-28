@@ -10,6 +10,7 @@ export interface LinkWithTags {
   url: string;
   title: string | null;
   description: string | null;
+  note: string | null;
   preview_path: string | null;
   created_at: string;
   updated_at: string;

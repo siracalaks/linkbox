@@ -4,6 +4,8 @@ export type Validation<T> = { ok: true; value: T } | { ok: false; error: string 
 export const INVALID_URL_MESSAGE = "Geçersiz URL";
 export const INVALID_TAG_MESSAGE = "Etiket uzunluğu geçersiz";
 export const DUPLICATE_LINK_MESSAGE = "Bu link zaten kayıtlı";
+export const NOTE_TOO_LONG_MESSAGE = "Not 200 karakteri geçemez";
+export const NOTE_MAX_LENGTH = 200;
 
 /**
  * URL doğrulama: yalnızca http/https kabul edilir.
@@ -29,6 +31,19 @@ export function validateTagName(raw: string): Validation<string> {
   const trimmed = raw.trim();
   if (trimmed.length < 1 || trimmed.length > 50) {
     return { ok: false, error: INVALID_TAG_MESSAGE };
+  }
+  return { ok: true, value: trimmed };
+}
+
+/**
+ * Not doğrulama: trim sonrası boşsa `null` (not silinmiş sayılır), 200
+ * karakteri aşarsa hata döner (FR-003, Edge Case).
+ */
+export function validateNote(raw: string): Validation<string | null> {
+  const trimmed = raw.trim();
+  if (!trimmed) return { ok: true, value: null };
+  if (trimmed.length > NOTE_MAX_LENGTH) {
+    return { ok: false, error: NOTE_TOO_LONG_MESSAGE };
   }
   return { ok: true, value: trimmed };
 }

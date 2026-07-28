@@ -23,6 +23,7 @@ function toLinkWithTags(row: LinkRow): LinkWithTags {
     url: row.url,
     title: row.title,
     description: row.description,
+    note: row.note,
     preview_path: row.previewPath,
     created_at: row.createdAt.toISOString(),
     updated_at: row.updatedAt.toISOString(),
