@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { deleteLink, updateLink } from "@/app/actions/links";
+import { NOTE_MAX_LENGTH } from "@/lib/validation";
 import type { LinkWithTags } from "@/lib/types";
 
 type Feedback = { kind: "error" | "info"; text: string } | null;
@@ -24,6 +25,8 @@ export function LinkDetailForm({
   const [description, setDescription] = useState(link.description ?? "");
   const [tagNames, setTagNames] = useState<string[]>(link.tags.map((tag) => tag.name));
   const [newTag, setNewTag] = useState("");
+  const [note, setNote] = useState(link.note ?? "");
+  const [noteOpen, setNoteOpen] = useState(Boolean(link.note));
   const [copied, setCopied] = useState(false);
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [isPending, startTransition] = useTransition();
@@ -42,7 +45,7 @@ export function LinkDetailForm({
   function handleSave() {
     setFeedback(null);
     startTransition(async () => {
-      const result = await updateLink({ id: link.id, title, description, tags: tagNames });
+      const result = await updateLink({ id: link.id, title, description, tags: tagNames, note });
       if (result.ok) {
         setFeedback({ kind: "info", text: "Değişiklikler kaydedildi" });
         router.refresh();
@@ -187,6 +190,61 @@ export function LinkDetailForm({
               ))}
           </datalist>
         </div>
+      </section>
+
+      <section className="flex flex-col gap-sm border-t border-white/5 pt-md">
+        <button
+          aria-controls="detail-note-panel"
+          aria-expanded={noteOpen}
+          className="flex items-center justify-between text-label-md text-primary"
+          onClick={() => setNoteOpen((open) => !open)}
+          type="button"
+        >
+          <span className="flex items-center gap-xs">
+            <span aria-hidden="true" className="material-symbols-outlined text-[18px]">
+              sticky_note_2
+            </span>
+            {link.note ? "Notu Düzenle" : "Not Ekle"}
+          </span>
+          <span
+            aria-hidden="true"
+            className={`material-symbols-outlined transition-transform ${noteOpen ? "rotate-180" : ""}`}
+          >
+            expand_more
+          </span>
+        </button>
+        {noteOpen ? (
+          <div className="flex flex-col gap-xs" id="detail-note-panel">
+            <label className="sr-only" htmlFor="detail-note">
+              Kişisel not
+            </label>
+            <textarea
+              className="w-full resize-none rounded-xl border border-white/10 bg-surface-container-low px-md py-md text-body-sm text-on-surface-variant outline-none transition-all focus:border-primary/50"
+              id="detail-note"
+              maxLength={NOTE_MAX_LENGTH}
+              onChange={(event) => setNote(event.target.value)}
+              placeholder="Bu link hakkında kısa bir not ekleyin..."
+              rows={3}
+              value={note}
+            />
+            <div className="flex flex-wrap items-center justify-between gap-sm">
+              <span className="text-label-xs text-on-surface-variant">
+                {note.length}/{NOTE_MAX_LENGTH}
+              </span>
+              <button
+                className="flex items-center gap-xs rounded-lg bg-primary-container px-md py-sm text-label-xs text-on-primary-container transition-all hover:brightness-110 active:scale-95 disabled:opacity-50"
+                disabled={isPending}
+                onClick={handleSave}
+                type="button"
+              >
+                <span aria-hidden="true" className="material-symbols-outlined text-[16px]">
+                  save
+                </span>
+                Kaydet
+              </button>
+            </div>
+          </div>
+        ) : null}
       </section>
 
       {feedback ? (

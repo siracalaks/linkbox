@@ -8,6 +8,7 @@ import { DB_PENDING_MESSAGE } from "@/lib/env";
 import {
   DUPLICATE_LINK_MESSAGE,
   normalizeTags,
+  validateNote,
   validateUrl,
 } from "@/lib/validation";
 import type { ActionResult } from "@/app/actions/auth";
@@ -24,6 +25,7 @@ export interface UpdateLinkInput {
   title?: string;
   description?: string;
   tags: string[];
+  note?: string | null;
 }
 
 type SessionContext =
@@ -132,6 +134,8 @@ export async function updateLink(input: UpdateLinkInput): Promise<ActionResult> 
 
   const tagsCheck = normalizeTags(input.tags);
   if (!tagsCheck.ok) return { ok: false, error: tagsCheck.error };
+  const noteCheck = validateNote(input.note ?? "");
+  if (!noteCheck.ok) return { ok: false, error: noteCheck.error };
 
   try {
     const updated = await db.link.updateMany({
@@ -139,6 +143,8 @@ export async function updateLink(input: UpdateLinkInput): Promise<ActionResult> 
       data: {
         title: input.title?.trim() || null,
         description: input.description?.trim() || null,
+        note: noteCheck.value,
+        updatedAt: new Date(),
       },
     });
     if (updated.count === 0) return { ok: false, error: "Link bulunamadı" };
